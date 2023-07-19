@@ -42,7 +42,6 @@ pub async fn subscribe_input_transactions(brokers: &str) -> Result<(), Box<dyn s
             }
         }
     }
-    Ok(())
 }
 
 fn print(s: &str) {
