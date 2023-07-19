@@ -1,3 +1,6 @@
+# Doc
+Lancement : `docker-compose up`
+lancement du kafka avec le topic input_transactions
 # green-got-exercice
 Implémentation d’un service de transformation de données.
 
