@@ -5,12 +5,13 @@ use axum::{
     Json, Router,
 };
 
-use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
 mod input_transaction;
+mod kafka_producer;
 
 use input_transaction::InputTransaction;
+use kafka_producer::add_input_transaction;
 
 #[tokio::main]
 async fn main() {
@@ -27,4 +28,8 @@ async fn main() {
 
 async fn receive_transaction(Json(payload): Json<InputTransaction>) -> impl IntoResponse {
     tracing::info!("received payload: {:?}", payload);
+
+    let brokers = "localhost:29092";
+    add_input_transaction(brokers, &payload).await;
+    StatusCode::OK
 }
