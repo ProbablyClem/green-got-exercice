@@ -1,55 +1,37 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
-};
-use rdkafka::config;
 use tokio::join;
+mod api;
+mod infra;
+mod models;
+mod services;
 
-use std::net::SocketAddr;
+use models::config::Config;
+use api::start_server;
+use infra::queue::consumer::kafka_consumer;
+use infra::queue::consumer::queue_consumer::QueueConsumer;
 
-mod input_transaction;
-mod kafka_consumer;
-mod kafka_producer;
-
-use input_transaction::InputTransaction;
-use kafka_consumer::subscribe_input_transactions;
-use kafka_producer::add_input_transaction;
-
-#[derive(Clone)]
-pub struct Config {
-    queue_config: String,
-}
+use crate::infra::queue::producer::kafka_producer::KafkaProducer;
+use crate::models::input_transaction::InputTransaction;
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    tracing::info!("listening on {}", addr);
+
+    let queue_config = "localhost:29092".to_string();
 
     let config = Config {
-        queue_config: "localhost:29092".to_string(),
+        queue_producer: Box::new(KafkaProducer::new(queue_config.clone())),
     };
 
-    let app : Router<()> = Router::new()
-        .route("/", post(receive_transaction))
-        .with_state(config.clone());
+    let api_future = start_server(config);
+    
+    let consumer = kafka_consumer::KafkaConsumer::new(queue_config);
+    let subscribe_future = consumer.subscribe_input_transactions(print);
 
-    let axum_future = axum::Server::bind(&addr).serve(app.into_make_service());
-
-    let consumer_future = subscribe_input_transactions(&config.queue_config);
-    join!(axum_future, consumer_future);
+    join!(api_future, subscribe_future);
 }
 
-async fn receive_transaction(
-    State(config): State<Config>,
-    Json(payload): Json<InputTransaction>,
-) -> impl IntoResponse {
-    tracing::info!("received payload: {:?}", payload);
-
-    let brokers = &config.queue_config;
-    add_input_transaction(brokers, &payload).await;
-    StatusCode::OK
+fn print(s: &str) {
+    let input_transaction =
+        serde_json::from_str::<InputTransaction>(s).expect("json deserialization failed");
+    println!("Input transaction: {:#?}", input_transaction);
 }
