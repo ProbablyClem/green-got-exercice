@@ -19,7 +19,7 @@ impl KafkaConsumer {
 
 #[async_trait]
 impl QueueConsumer for KafkaConsumer {
-    async fn subscribe_input_transactions(&self, callback: fn(&str)) -> Result<(), Box<dyn std::error::Error>> {
+    async fn subscribe_input_transactions(&self, callback: fn(String)) -> Result<(), Box<dyn std::error::Error>> {
         let consumer = create_consumer(&self.brokers);
         let topic = "input_transactions";
         consumer
@@ -31,7 +31,7 @@ impl QueueConsumer for KafkaConsumer {
                 Ok(m) => {
                     match m.payload_view::<str>() {
                         None => (),
-                        Some(Ok(s)) => callback(s),
+                        Some(Ok(s)) => callback(s.to_string()),
                         Some(Err(e)) => {
                             warn!("Error while deserializing message payload: {:?}", e);
                         }

@@ -14,5 +14,5 @@ pub async fn start_server(config : Config) {
         .route("/", post(receive_transaction))
         .with_state(config.clone());
 
-    axum::Server::bind(&addr).serve(app.into_make_service());
+    axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }

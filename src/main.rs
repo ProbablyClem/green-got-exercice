@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tokio::join;
 mod api;
 mod infra;
@@ -19,7 +21,7 @@ async fn main() {
     let queue_config = "localhost:29092".to_string();
 
     let config = Config {
-        queue_producer: Box::new(KafkaProducer::new(queue_config.clone())),
+        queue_producer: Arc::new(KafkaProducer::new(queue_config.clone())),
     };
 
     let api_future = start_server(config);
@@ -30,8 +32,8 @@ async fn main() {
     join!(api_future, subscribe_future);
 }
 
-fn print(s: &str) {
+fn print(s: String) {
     let input_transaction =
-        serde_json::from_str::<InputTransaction>(s).expect("json deserialization failed");
+        serde_json::from_str::<InputTransaction>(&s).expect("json deserialization failed");
     println!("Input transaction: {:#?}", input_transaction);
 }
