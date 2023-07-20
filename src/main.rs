@@ -11,23 +11,30 @@ use api::start_server;
 use infra::queue::consumer::kafka_consumer;
 use infra::queue::consumer::queue_consumer::QueueConsumer;
 
+use crate::infra::queue::consumer::kafka_consumer::KafkaConsumer;
 use crate::infra::queue::producer::kafka_producer::KafkaProducer;
-use crate::services::output_transaction_service::handle_transaction;
+use crate::infra::webhook::webhook_mock::WebhookMock;
+use crate::services::logo_service::LogoServiceMap;
+use crate::services::output_transaction_service::OutputTransactionService;
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
     let queue_config = "localhost:29092".to_string();
-
+    let producer = KafkaProducer::new(queue_config.clone());
+    let consumer = KafkaConsumer::new(queue_config);
     let config = Config {
-        queue_producer: Arc::new(KafkaProducer::new(queue_config.clone())),
+        queue_producer: Arc::new(producer),
     };
 
     let api_future = start_server(config);
-    
-    let consumer = kafka_consumer::KafkaConsumer::new(queue_config);
-    let subscribe_future = consumer.subscribe_input_transactions(handle_transaction);
+
+
+    let webhook = Box::new(WebhookMock {});
+
+    let output_transaction_service = OutputTransactionService::new(webhook);
+    let subscribe_future = consumer.subscribe_input_transactions(output_transaction_service);
 
     join!(api_future, subscribe_future);
 }

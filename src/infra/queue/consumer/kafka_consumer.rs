@@ -3,10 +3,10 @@ use async_trait::async_trait;
 use rdkafka::{Message, ClientConfig};
 
 use rdkafka::consumer::{StreamConsumer, Consumer};
-use rdkafka::error::KafkaResult;
 use tracing::warn;
 
 use crate::infra::queue::consumer::queue_consumer::QueueConsumer;
+use crate::services::output_transaction_service::OutputTransactionService;
 pub struct KafkaConsumer {
     brokers: String,
 }
@@ -19,7 +19,7 @@ impl KafkaConsumer {
 
 #[async_trait]
 impl QueueConsumer for KafkaConsumer {
-    async fn subscribe_input_transactions(&self, callback: fn(String)) -> Result<(), Box<dyn std::error::Error>> {
+    async fn subscribe_input_transactions(&self, service: OutputTransactionService) -> Result<(), Box<dyn std::error::Error>> {
         let consumer = create_consumer(&self.brokers);
         let topic = "input_transactions";
         consumer
@@ -31,7 +31,7 @@ impl QueueConsumer for KafkaConsumer {
                 Ok(m) => {
                     match m.payload_view::<str>() {
                         None => (),
-                        Some(Ok(s)) => callback(s.to_string()),
+                        Some(Ok(s)) => service.receive(s.to_string()),
                         Some(Err(e)) => {
                             warn!("Error while deserializing message payload: {:?}", e);
                         }

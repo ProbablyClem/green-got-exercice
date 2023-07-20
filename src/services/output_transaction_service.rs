@@ -1,13 +1,26 @@
-use crate::models::{
+use crate::{models::{
     input_transaction::InputTransaction,
     output_transaction::{Direction, OutputAmout, OutputTransaction},
-};
+}, infra::webhook::webhook::Webhook};
 
 use super::logo_service::{LogoService, LogoServiceMap};
 
-pub fn handle_transaction(string: String) {
-    let input_transaction = InputTransaction::from(string);
-    let output_transaction = OutputTransaction::from(input_transaction);
+pub struct OutputTransactionService {
+    webhook: Box<dyn Webhook + Send>,
+}
+
+impl OutputTransactionService {
+    pub fn new(webhook: Box<dyn Webhook + Send>) -> Self {
+        OutputTransactionService {
+            webhook,
+        }
+    }
+
+    pub fn receive(&self, input_transaction: String) {
+        let input_transaction = InputTransaction::from(input_transaction);
+        let output_transaction = OutputTransaction::from(input_transaction);
+        self.webhook.send(output_transaction);
+    }
 }
 
 impl From<InputTransaction> for OutputTransaction {
