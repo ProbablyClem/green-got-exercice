@@ -2,13 +2,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct InputTransaction {
-    clientId: String,
-    amount: Amount,
-    counterpart : String
+    pub clientId: String,
+    pub amount: InputAmount,
+    pub counterpart : String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Amount {
-    value: f64,
-    currency: String,
+pub struct InputAmount {
+    pub value: f64,
+    pub currency: String,
+}
+
+impl From<String> for InputTransaction {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).unwrap()
+    }
 }

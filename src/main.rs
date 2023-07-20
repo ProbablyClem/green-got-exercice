@@ -12,7 +12,7 @@ use infra::queue::consumer::kafka_consumer;
 use infra::queue::consumer::queue_consumer::QueueConsumer;
 
 use crate::infra::queue::producer::kafka_producer::KafkaProducer;
-use crate::models::input_transaction::InputTransaction;
+use crate::services::output_transaction_service::handle_transaction;
 
 #[tokio::main]
 async fn main() {
@@ -27,13 +27,7 @@ async fn main() {
     let api_future = start_server(config);
     
     let consumer = kafka_consumer::KafkaConsumer::new(queue_config);
-    let subscribe_future = consumer.subscribe_input_transactions(print);
+    let subscribe_future = consumer.subscribe_input_transactions(handle_transaction);
 
     join!(api_future, subscribe_future);
-}
-
-fn print(s: String) {
-    let input_transaction =
-        serde_json::from_str::<InputTransaction>(&s).expect("json deserialization failed");
-    println!("Input transaction: {:#?}", input_transaction);
 }
