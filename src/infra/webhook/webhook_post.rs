@@ -4,7 +4,7 @@ use tracing::info;
 
 use crate::models::output_transaction::OutputTransaction;
 
-use super::webhook::Webhook;
+use super::Webhook;
 
 pub struct WebhookPost {
     url: String,
@@ -40,23 +40,23 @@ impl Webhook for WebhookPost {
 mod test {
     use super::*;
     use crate::models::output_transaction::OutputTransaction;
-    use crate::infra::webhook::webhook::Webhook;
+    use crate::infra::webhook::Webhook;
     use crate::models::output_transaction::Direction;
     use crate::models::output_transaction::OutputAmout;
 
     #[tokio::test]
     async fn test_webhook_post() {
-        let webhook = WebhookPost::new("https://postman-echo.com/post/".to_string());
+        let webhook = WebhookPost::new("http://postman-echo.com/post/".to_string());
         let output_transaction = OutputTransaction {
-            clientId: "1234567890".to_string(),
+            client_id: "1234567890".to_string(),
             amount: OutputAmout {
                 value: 150,
                 currency: "euros".to_string(),
             },
             counterpart: "papa".to_string(),
-            rawCounterpart: None,
+            rawcounterpart: None,
             logo: None,
-            direction: Direction::CREDIT,
+            direction: Direction::Credit,
         };
         webhook.send(output_transaction).await;
     }

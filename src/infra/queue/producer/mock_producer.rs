@@ -7,6 +7,7 @@ use super::queue_producer::QueueProducer;
 pub struct MockProducer {}
 
 impl MockProducer {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         MockProducer {}
     }

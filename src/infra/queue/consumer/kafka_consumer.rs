@@ -7,7 +7,7 @@ use tracing::warn;
 
 use crate::infra::queue::consumer::queue_consumer::QueueConsumer;
 use crate::models::input_transaction;
-use crate::services::output_transaction_service::OutputTransactionService;
+
 use crate::services::transaction_handler::TransactionHandler;
 pub struct KafkaConsumer {
     brokers: String,

@@ -2,10 +2,12 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
 pub struct OutputTransaction {
-    pub clientId: String,
+    #[serde(rename = "clientId")]
+    pub client_id: String,
     pub amount: OutputAmout,
     pub counterpart : String,
-    pub rawCounterpart : Option<String>,
+    #[serde(rename = "rawCounterpart")]
+    pub rawcounterpart : Option<String>,
     pub logo : Option<String>,
     pub direction: Direction,
 }
@@ -18,7 +20,9 @@ pub struct OutputAmout {
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
 pub enum Direction {
-    DEBIT,
-    CREDIT  ,    
+    #[serde(rename = "DEBIT")]
+    Debit,
+    #[serde(rename = "CREDIT")]
+    Credit,    
 }
 

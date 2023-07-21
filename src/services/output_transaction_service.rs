@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use crate::{
-    infra::webhook::webhook::Webhook,
+    infra::webhook::Webhook,
     models::{
         input_transaction::InputTransaction,
         output_transaction::{Direction, OutputAmout, OutputTransaction},
@@ -24,7 +24,6 @@ impl OutputTransactionService {
 #[async_trait]
 impl TransactionHandler for OutputTransactionService {
     async fn handle(&self, input_transaction: InputTransaction) {
-        let input_transaction = InputTransaction::from(input_transaction);
         let output_transaction = OutputTransaction::from(input_transaction);
         self.webhook.send(output_transaction).await
     }
@@ -34,7 +33,7 @@ impl From<InputTransaction> for OutputTransaction {
     fn from(input_transaction: InputTransaction) -> Self {
         let direction = get_direction(input_transaction.amount.value);
         let counterpart = get_first_word(&input_transaction.counterpart);
-        let rawCounterpart = match counterpart == input_transaction.counterpart {
+        let rawcounterpart = match counterpart == input_transaction.counterpart {
             true => None,
             false => Some(input_transaction.counterpart),
         };
@@ -43,10 +42,10 @@ impl From<InputTransaction> for OutputTransaction {
         let logo = logo_service.get_logo(&counterpart);
 
         OutputTransaction {
-            clientId: input_transaction.clientId,
+            client_id: input_transaction.client_id,
             amount: OutputAmout::from(input_transaction.amount),
             counterpart,
-            rawCounterpart,
+            rawcounterpart,
             logo,
             direction,
         }
@@ -55,8 +54,8 @@ impl From<InputTransaction> for OutputTransaction {
 
 fn get_direction(value: f64) -> Direction {
     match value > 0.0 {
-        true => Direction::CREDIT,
-        false => Direction::DEBIT,
+        true => Direction::Credit,
+        false => Direction::Debit,
     }
 }
 
@@ -75,24 +74,24 @@ mod test {
     use crate::{
         models::{
             input_transaction::InputAmount,
-            output_transaction::{self, Direction, OutputAmout},
+            output_transaction::{Direction, OutputAmout},
         },
         services::output_transaction_service::get_direction,
     };
 
     #[test]
     fn test_get_direction_debit() {
-        assert_eq!(get_direction(1.0), Direction::CREDIT);
+        assert_eq!(get_direction(1.0), Direction::Credit);
     }
 
     #[test]
     fn test_get_direction_credit() {
-        assert_eq!(get_direction(-1.0), Direction::DEBIT);
+        assert_eq!(get_direction(-1.0), Direction::Debit);
     }
 
     #[test]
     fn test_get_direction_zero() {
-        assert_eq!(get_direction(0.0), Direction::DEBIT);
+        assert_eq!(get_direction(0.0), Direction::Debit);
     }
 
     #[test]
@@ -108,7 +107,7 @@ mod test {
     #[test]
     fn test_from_input_transaction_complex_counterpart() {
         let input_transaction = InputTransaction {
-            clientId: "1234567890".to_string(),
+            client_id: "1234567890".to_string(),
             amount: InputAmount {
                 value: -10.22,
                 currency: "euros".to_string(),
@@ -116,15 +115,15 @@ mod test {
             counterpart: "SCNF VA122345 dt: 01/01/2020".to_string(),
         };
         let output_transaction = OutputTransaction {
-            clientId: "1234567890".to_string(),
+            client_id: "1234567890".to_string(),
             amount: OutputAmout {
                 value: 1022,
                 currency: "EUR".to_string(),
             },
             counterpart: "SCNF".to_string(),
-            rawCounterpart: Some("SCNF VA122345 dt: 01/01/2020".to_string()),
+            rawcounterpart: Some("SCNF VA122345 dt: 01/01/2020".to_string()),
             logo: Some("/companies/logo-sncf.svg".to_string()),
-            direction: Direction::DEBIT,
+            direction: Direction::Debit,
         };
         assert_eq!(
             OutputTransaction::from(input_transaction),
@@ -135,7 +134,7 @@ mod test {
     #[test]
     fn test_from_input_transaction_simple_counterpart() {
         let input_transaction = InputTransaction {
-            clientId: "1234567890".to_string(),
+            client_id: "1234567890".to_string(),
             amount: InputAmount {
                 value: 150.0,
                 currency: "euros".to_string(),
@@ -143,15 +142,15 @@ mod test {
             counterpart: "papa".to_string(),
         };
         let output_transaction = OutputTransaction {
-            clientId: "1234567890".to_string(),
+            client_id: "1234567890".to_string(),
             amount: OutputAmout {
                 value: 15000,
                 currency: "EUR".to_string(),
             },
             counterpart: "papa".to_string(),
-            rawCounterpart: None,
+            rawcounterpart: None,
             logo: None,
-            direction: Direction::CREDIT,
+            direction: Direction::Credit,
         };
         assert_eq!(
             OutputTransaction::from(input_transaction),

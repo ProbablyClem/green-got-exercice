@@ -1,4 +1,4 @@
-use std::{cell::{Cell, RefCell}, sync::Arc};
+use std::{sync::Arc};
 
 use crate::infra::queue::producer::queue_producer::QueueProducer;
 

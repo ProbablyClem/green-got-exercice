@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct InputTransaction {
-    pub clientId: String,
+    #[serde(rename = "clientId")]
+    pub client_id: String,
     pub amount: InputAmount,
     pub counterpart : String
 }
