@@ -44,11 +44,13 @@ mod test {
 
     use crate::{
         api::start_server,
-        infra::queue::producer::mock_producer::MockProducer,
+        infra::{queue::{
+            consumer::{mock_consumer::MockConsumer, queue_consumer::QueueConsumer}, producer::mock_producer::MockProducer,
+        }, webhook::webhook_mock::WebhookMock},
         models::{
             config::Config,
             input_transaction::{InputAmount, InputTransaction},
-        },
+        }, services::output_transaction_service::OutputTransactionService,
     };
 
     #[tokio::test]
@@ -67,7 +69,6 @@ mod test {
 
     #[tokio::test]
     async fn test_ws_invalid() {
-
         //Missing counterpart
         let input = r#"{
             "clientId": "1234567890",
@@ -76,7 +77,7 @@ mod test {
                 "currency": "euros"
             },
         }"#;
-        
+
         let statut = call_ws(input).await;
         assert_eq!(statut, StatusCode::BAD_REQUEST)
     }
@@ -93,8 +94,6 @@ mod test {
 
         let client = hyper::Client::new();
 
-
-
         let response = client
             .request(
                 Request::builder()
@@ -107,5 +106,17 @@ mod test {
             .await
             .unwrap();
         response.status()
+    }
+
+
+    //Testing that the webhook is called by the service
+    #[tokio::test]
+    async fn test_webhook() {
+        let consumer = MockConsumer::new();
+
+        let webhook = Box::new(WebhookMock::new());
+
+        let output_transaction_service = OutputTransactionService::new(webhook);
+        consumer.subscribe_input_transactions(output_transaction_service).await.unwrap();
     }
 }

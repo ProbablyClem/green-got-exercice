@@ -17,6 +17,6 @@ impl WebhookMock {
 impl Webhook for WebhookMock {
 
     fn send(&self, output_transaction: OutputTransaction) {
-        println!("WebhookMock::send({:?})", output_transaction);
+        assert!(true)
     }
 }
