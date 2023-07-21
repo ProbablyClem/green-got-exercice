@@ -6,8 +6,7 @@ use crate::Config;
 
 use crate::services::input_transaction_service::receive_transaction;
 
-pub async fn start_server(config : Config) {
-   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+pub async fn start_server(config : Config, addr : SocketAddr) {
     tracing::info!("listening on {}", addr);
 
     let app : Router<()> = Router::new()

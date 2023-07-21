@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::sync::Arc;
 
 use tokio::join;
@@ -26,7 +27,8 @@ async fn main() {
         queue_producer: Arc::new(producer),
     };
 
-    let api_future = start_server(config);
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let api_future = start_server(config, addr);
 
     let webhook = Box::new(WebhookMock::new());
 
@@ -39,7 +41,7 @@ async fn main() {
 //Integration tests
 #[cfg(test)]
 mod test {
-    use std::sync::Arc;
+    use std::{sync::Arc, net::SocketAddr};
 
     use hyper::{Body, Method, Request, StatusCode};
 
@@ -90,8 +92,8 @@ mod test {
             let config = Config {
                 queue_producer: Arc::new(producer),
             };
-
-            start_server(config).await;
+             let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+            start_server(config, addr).await;
         });
 
         let client = hyper::Client::new();
@@ -101,7 +103,7 @@ mod test {
                 Request::builder()
                     .method(Method::POST)
                     .header("content-type", "application/json")
-                    .uri("http://127.0.0.1:3000/")
+                    .uri("http://localhost:3000/")
                     .body(Body::from(input.to_string()))
                     .unwrap(),
             )
