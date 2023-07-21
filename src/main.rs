@@ -52,7 +52,7 @@ mod test {
     };
 
     #[tokio::test]
-    async fn test_ws_valide() {
+    async fn test_ws_valid() {
         let input = r#"{
             "clientId": "1234567890",
             "amount": {
@@ -63,6 +63,22 @@ mod test {
         }"#;
         let statut = call_ws(input).await;
         assert_eq!(statut, StatusCode::OK)
+    }
+
+    #[tokio::test]
+    async fn test_ws_invalid() {
+
+        //Missing counterpart
+        let input = r#"{
+            "clientId": "1234567890",
+            "amount": {
+                "value": 150.0,
+                "currency": "euros"
+            },
+        }"#;
+        
+        let statut = call_ws(input).await;
+        assert_eq!(statut, StatusCode::BAD_REQUEST)
     }
 
     async fn call_ws(input: &str) -> StatusCode {
