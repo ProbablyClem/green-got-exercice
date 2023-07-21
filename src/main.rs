@@ -32,7 +32,7 @@ async fn main() {
     let api_future = start_server(config, addr);
 
     let webhook = Box::new(WebhookPost::new(
-        "https://postman-echo.com/post".to_string(),
+        "http://postman-echo.com/post".to_string(),
     ));
 
     let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
