@@ -36,6 +36,7 @@ async fn main() {
     join!(api_future, subscribe_future);
 }
 
+//Integration tests
 #[cfg(test)]
 mod test {
     use std::sync::Arc;
@@ -82,6 +83,7 @@ mod test {
         assert_eq!(statut, StatusCode::BAD_REQUEST)
     }
 
+    //Start the serveur and call send request
     async fn call_ws(input: &str) -> StatusCode {
         tokio::spawn(async move {
             let producer = MockProducer::new();
