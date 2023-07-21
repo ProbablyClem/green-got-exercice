@@ -14,6 +14,7 @@ use models::config::Config;
 use crate::infra::queue::consumer::kafka_consumer::KafkaConsumer;
 use crate::infra::queue::producer::kafka_producer::KafkaProducer;
 use crate::infra::webhook::webhook_mock::WebhookMock;
+use crate::infra::webhook::webhook_post::WebhookPost;
 use crate::services::output_transaction_service::OutputTransactionService;
 
 #[tokio::main]
@@ -30,9 +31,9 @@ async fn main() {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     let api_future = start_server(config, addr);
 
-    let webhook = Box::new(WebhookMock::new());
+    let webhook = Box::new(WebhookPost::new("https://postman-echo.com/post".to_string()));
 
-    let output_transaction_service = OutputTransactionService::new(webhook);
+    let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
     let subscribe_future = consumer.subscribe_input_transactions(output_transaction_service);
 
     join!(api_future, subscribe_future);
@@ -120,7 +121,7 @@ mod test {
 
         let webhook = Box::new(WebhookMock::new());
 
-        let output_transaction_service = OutputTransactionService::new(webhook);
+        let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
         consumer.subscribe_input_transactions(output_transaction_service).await.unwrap();
     }
 }

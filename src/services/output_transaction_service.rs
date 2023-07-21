@@ -1,25 +1,32 @@
-use crate::{models::{
-    input_transaction::InputTransaction,
-    output_transaction::{Direction, OutputAmout, OutputTransaction},
-}, infra::webhook::webhook::Webhook};
+use async_trait::async_trait;
 
-use super::logo_service::{LogoService, LogoServiceMap};
+use crate::{
+    infra::webhook::webhook::Webhook,
+    models::{
+        input_transaction::InputTransaction,
+        output_transaction::{Direction, OutputAmout, OutputTransaction},
+    },
+};
+
+use super::{logo_service::{LogoService, LogoServiceMap}, transaction_handler::TransactionHandler};
 
 pub struct OutputTransactionService {
-    webhook: Box<dyn Webhook + Send>,
+    webhook: Box<dyn Webhook + Send + Sync>,
 }
 
-impl OutputTransactionService {
-    pub fn new(webhook: Box<dyn Webhook + Send>) -> Self {
-        OutputTransactionService {
-            webhook,
-        }
-    }
 
-    pub fn receive(&self, input_transaction: String) {
+impl OutputTransactionService {
+    pub fn new(webhook: Box<dyn Webhook + Send + Sync>) -> Self {
+        OutputTransactionService { webhook } 
+    }
+}
+
+#[async_trait]
+impl TransactionHandler for OutputTransactionService {
+    async fn handle(&self, input_transaction: InputTransaction) {
         let input_transaction = InputTransaction::from(input_transaction);
         let output_transaction = OutputTransaction::from(input_transaction);
-        self.webhook.send(output_transaction);
+        self.webhook.send(output_transaction).await
     }
 }
 
@@ -54,7 +61,11 @@ fn get_direction(value: f64) -> Direction {
 }
 
 fn get_first_word(string: &str) -> String {
-    string.split_ascii_whitespace().next().unwrap_or("").to_string()
+    string
+        .split_ascii_whitespace()
+        .next()
+        .unwrap_or("")
+        .to_string()
 }
 
 #[cfg(test)]

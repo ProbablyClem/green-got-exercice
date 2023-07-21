@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::models::output_transaction::OutputTransaction;
 
 use super::webhook::Webhook;
@@ -14,9 +16,9 @@ impl WebhookMock {
     }
 }
 
+#[async_trait]
 impl Webhook for WebhookMock {
-
-    fn send(&self, output_transaction: OutputTransaction) {
+    async fn send(&self, _: OutputTransaction) {
         assert!(true)
     }
 }

@@ -1,5 +1,8 @@
+use async_trait::async_trait;
+
 use crate::models::output_transaction::OutputTransaction;
 
+#[async_trait]
 pub trait Webhook {
-    fn send(&self, output_transaction: OutputTransaction);
+    async fn send(&self, output_transaction: OutputTransaction);
 }
