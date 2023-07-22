@@ -35,7 +35,7 @@ jobs:
             cd green-got-exercice &&
             git checkout main &&
             git fetch --all &&
-            git reset --hard origin/master &&
-            git pull origin master &&
+            git reset --hard origin/main &&
+            git pull origin main &&
             docker-compose up -d --build 
           '
