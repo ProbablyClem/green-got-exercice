@@ -55,7 +55,7 @@ impl QueueConsumer for KafkaConsumer {
 fn create_consumer(brokers: &str) -> StreamConsumer {
     ClientConfig::new()
         .set("bootstrap.servers", brokers)
-         .set("group.id", "service")
+        .set("group.id", "service")
         .set("enable.auto.commit", "false")
         .create()
         .unwrap()

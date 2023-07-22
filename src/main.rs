@@ -10,30 +10,34 @@ mod services;
 use api::start_server;
 use infra::queue::consumer::queue_consumer::QueueConsumer;
 use models::config::Config;
+use tracing::info;
 
 use crate::infra::queue::consumer::kafka_consumer::KafkaConsumer;
 use crate::infra::queue::producer::kafka_producer::KafkaProducer;
 
 use crate::infra::webhook::webhook_post::WebhookPost;
 use crate::services::output_transaction_service::OutputTransactionService;
+use dotenv::dotenv;
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok(); // This line loads the environment variables from the .env file
     tracing_subscriber::fmt::init();
 
-    let queue_config = "localhost:29092".to_string();
+    let queue_config = std::env::var("KAFKA_HOST").expect("KAFKA_HOST env variable must be set.");
+    info!("Kafka host : {}", queue_config);
+    
     let producer = KafkaProducer::new(queue_config.clone());
     let consumer = KafkaConsumer::new(queue_config);
     let config = Config {
         queue_producer: Arc::new(producer),
     };
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let port = std::env::var("PORT").expect("PORT env variable must be set.").parse::<u16>().expect("PORT env variable must be a number.");
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let api_future = start_server(config, addr);
 
-    let webhook = Box::new(WebhookPost::new(
-        "http://postman-echo.com/post".to_string(),
-    ));
+    let webhook = Box::new(WebhookPost::new("http://postman-echo.com/post".to_string()));
 
     let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
     let subscribe_future = consumer.subscribe_input_transactions(output_transaction_service);
