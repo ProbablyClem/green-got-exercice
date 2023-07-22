@@ -1,6 +1,26 @@
-# Doc
-Lancement : `docker-compose up`
-lancement du kafka avec le topic input_transactions
+# Run
+start app with `docker-compose up --build`
+this will start the service listening on port 300 and the kafka broker
+
+## Developpement environnement
+### Prerequisites
+    - docker
+    - docker-compose
+    - rust
+    - cmake (needed for the rdkafka client)
+### Run
+ run `docker-compose -f docker-compose-kafka.yaml up` to start kafka broker
+ run `cargo run` to start the service
+### Test
+    run `cargo test` to run the tests
+
+### Environnement variables
+This service use the following environnement variables :
+- KAFKA_HOST : kafka broker host
+- PORT : service port 
+- WEBHOOK_URL : webhook url
+Thoses can be set in the .env file
+
 # green-got-exercice
 Implémentation d’un service de transformation de données.
 

@@ -41,15 +41,3 @@ services:
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka:9092 --list
       "
-
-  back:
-    build: .
-    depends_on:
-      kafka:
-        condition: service_healthy
-    ports:
-      - 3000:3000
-    environment:
-      KAFKA_HOST: kafka:9092
-      PORT: 3000
-      WEBHOOK_URL: http://postman-echo.com/post

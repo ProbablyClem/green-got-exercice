@@ -37,7 +37,8 @@ async fn main() {
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let api_future = start_server(config, addr);
 
-    let webhook = Box::new(WebhookPost::new("http://postman-echo.com/post".to_string()));
+    let webhook_url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL env variable must be set.");
+    let webhook = Box::new(WebhookPost::new(webhook_url));
 
     let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
     let subscribe_future = consumer.subscribe_input_transactions(output_transaction_service);
@@ -133,5 +134,6 @@ mod test {
             .subscribe_input_transactions(output_transaction_service)
             .await
             .unwrap();
+
     }
 }
