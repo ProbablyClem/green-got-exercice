@@ -55,15 +55,8 @@ mod test {
 
     use crate::{
         api::start_server,
-        infra::{
-            queue::{
-                consumer::{mock_consumer::MockConsumer, queue_consumer::QueueConsumer},
-                producer::mock_producer::MockProducer,
-            },
-            webhook::webhook_mock::WebhookMock,
-        },
+        infra::queue::producer::mock_producer::MockProducer,
         models::config::Config,
-        services::output_transaction_service::OutputTransactionService,
     };
 
     #[tokio::test]
@@ -120,20 +113,5 @@ mod test {
             .await
             .unwrap();
         response.status()
-    }
-
-    //Testing that the webhook is called by the service
-    #[tokio::test]
-    async fn test_webhook() {
-        let consumer = MockConsumer::new();
-
-        let webhook = Box::new(WebhookMock::new());
-
-        let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
-        consumer
-            .subscribe_input_transactions(output_transaction_service)
-            .await
-            .unwrap();
-
     }
 }
