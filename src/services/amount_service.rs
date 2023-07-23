@@ -9,10 +9,13 @@ impl From<InputAmount> for OutputAmout {
     }
 }
 
+/// multiply by 100 and get absolute value
+/// Converting euros to cents
 fn normalize_value(value: f64) -> u64 {
     (value * 100.0).abs() as u64 
 }
 
+/// truncate to 3 characters and uppercase
 fn normalize_currency(currency: String) -> String {
     let currency_truncated = match currency.len() > 3 {
         true => currency[0..3].to_string(),

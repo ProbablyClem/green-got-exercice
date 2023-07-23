@@ -20,7 +20,7 @@ use crate::services::input_transaction_service::__path_receive_transaction;
     )]
     struct ApiDoc;
 
-
+/// Starts the HTTP server
 pub async fn start_server(config : Config, addr : SocketAddr) {
     tracing::info!("listening on {}", addr);
 

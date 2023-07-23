@@ -10,6 +10,8 @@ use crate::{
 
 use super::{logo_service::{LogoService, LogoServiceMap}, transaction_handler::TransactionHandler};
 
+
+/// Service that handles the input transaction and send it to the webhook
 pub struct OutputTransactionService<'a, T: Webhook> {
     webhook: &'a T,
 }
@@ -51,6 +53,7 @@ impl From<InputTransaction> for OutputTransaction {
         }
     }
 }
+
 
 fn get_direction(value: f64) -> Direction {
     match value > 0.0 {

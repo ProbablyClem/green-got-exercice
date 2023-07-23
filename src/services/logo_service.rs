@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
+/// LogoService is responsible for returning the logo of a company
 pub trait LogoService {
+    ///get the logo from a counterpart
     fn get_logo(&self, counterpart: &str) -> Option<String>;
 }
 
+/// LogoServiceMap is a simple implementation of LogoService using a HashMap
 pub struct LogoServiceMap {
     map: HashMap<String, String>,
 }

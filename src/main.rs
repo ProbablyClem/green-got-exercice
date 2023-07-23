@@ -88,7 +88,7 @@ mod test {
         assert_eq!(statut, StatusCode::BAD_REQUEST)
     }
 
-    //Start the serveur and call send request
+    ///Start the serveur and call send request
     async fn call_ws(input: &str) -> StatusCode {
         tokio::spawn(async move {
             let producer = MockProducer::new();
