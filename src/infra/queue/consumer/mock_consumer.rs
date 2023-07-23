@@ -17,11 +17,8 @@ impl MockConsumer {
 }
 
 #[async_trait]
-impl QueueConsumer for MockConsumer {
-    async fn subscribe_input_transactions(
-        &self,
-        service: Box<dyn TransactionHandler + Send + Sync>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+impl<'a, T : TransactionHandler+ Send + Sync> QueueConsumer<'a, T> for MockConsumer where T: TransactionHandler{
+    async fn subscribe_input_transactions(&self, service: &'a T) -> Result<(), Box<dyn std::error::Error>> {
         for input_transaction in get_mock_list() {
             service.handle(input_transaction).await;
         }

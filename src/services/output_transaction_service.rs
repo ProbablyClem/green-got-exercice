@@ -10,19 +10,19 @@ use crate::{
 
 use super::{logo_service::{LogoService, LogoServiceMap}, transaction_handler::TransactionHandler};
 
-pub struct OutputTransactionService {
-    webhook: Box<dyn Webhook + Send + Sync>,
+pub struct OutputTransactionService<'a, T: Webhook> {
+    webhook: &'a T,
 }
 
 
-impl OutputTransactionService {
-    pub fn new(webhook: Box<dyn Webhook + Send + Sync>) -> Self {
+impl<'a, T: Webhook> OutputTransactionService<'a, T> where T: Webhook {
+    pub fn new(webhook: &'a T) -> Self {
         OutputTransactionService { webhook } 
     }
 }
 
 #[async_trait]
-impl TransactionHandler for OutputTransactionService {
+impl<'a, T: Webhook> TransactionHandler for OutputTransactionService<'a, T> where T: Webhook + Send + Sync  {
     async fn handle(&self, input_transaction: InputTransaction) {
         let output_transaction = OutputTransaction::from(input_transaction);
         self.webhook.send(output_transaction).await

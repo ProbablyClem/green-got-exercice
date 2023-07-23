@@ -38,10 +38,10 @@ async fn main() {
     let api_future = start_server(config, addr);
 
     let webhook_url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL env variable must be set.");
-    let webhook = Box::new(WebhookPost::new(webhook_url));
+    let webhook = WebhookPost::new(webhook_url);
 
-    let output_transaction_service = Box::new(OutputTransactionService::new(webhook));
-    let subscribe_future = consumer.subscribe_input_transactions(output_transaction_service);
+    let output_transaction_service = OutputTransactionService::new(&webhook);
+    let subscribe_future = consumer.subscribe_input_transactions(&output_transaction_service);
 
     let _ = join!(api_future, subscribe_future);
 }
@@ -55,8 +55,8 @@ mod test {
 
     use crate::{
         api::start_server,
-        infra::queue::producer::mock_producer::MockProducer,
-        models::config::Config,
+        infra::{queue::{producer::mock_producer::MockProducer, consumer::{mock_consumer::MockConsumer, queue_consumer::QueueConsumer}}, webhook::webhook_mock::WebhookMock},
+        models::config::Config, services::output_transaction_service::OutputTransactionService,
     };
 
     #[tokio::test]
@@ -114,4 +114,20 @@ mod test {
             .unwrap();
         response.status()
     }
+
+    /// Testing that the webhook is called by the service
+    #[tokio::test]
+    async fn test_webhook() {
+        let consumer = MockConsumer::new();
+
+        let webhook = WebhookMock::new();
+
+        let output_transaction_service = OutputTransactionService::new(&webhook);
+        consumer
+            .subscribe_input_transactions(&output_transaction_service)
+            .await
+            .unwrap();
+        assert_eq!(webhook.sent_transactions.read().unwrap().len(), 2); //2 transactions in the mock queue
+    }
+
 }

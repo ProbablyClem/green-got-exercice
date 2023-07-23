@@ -1,11 +1,13 @@
 use async_trait::async_trait;
-use hyper::{Request, Method, Body};
+use hyper::{Body, Method, Request};
+use tokio::task::block_in_place;
 use tracing::info;
 
 use crate::models::output_transaction::OutputTransaction;
 
 use super::Webhook;
 
+#[derive(Clone)]
 pub struct WebhookPost {
     url: String,
 }
@@ -39,10 +41,10 @@ impl Webhook for WebhookPost {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::output_transaction::OutputTransaction;
     use crate::infra::webhook::Webhook;
     use crate::models::output_transaction::Direction;
     use crate::models::output_transaction::OutputAmout;
+    use crate::models::output_transaction::OutputTransaction;
 
     #[tokio::test]
     async fn test_webhook_post() {
