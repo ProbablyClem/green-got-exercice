@@ -1,3 +1,10 @@
+# Data transformation service
+asynchrounous service that transform data from a kafka topic and send it to a webhook
+
+## Documentation
+### API
+Api documentation is available at http://ec2-13-37-250-1.eu-west-3.compute.amazonaws.com:3000/swagger-ui/#/
+
 # Run
 start app with `docker-compose up --build`
 this will start the service listening on port 300 and the kafka broker
@@ -9,17 +16,17 @@ this will start the service listening on port 300 and the kafka broker
     - rust
     - cmake (needed for the rdkafka client)
 ### Run
- run `docker-compose -f docker-compose-kafka.yaml up` to start kafka broker
- run `cargo run` to start the service
+- run `docker-compose -f docker-compose-kafka.yaml up` to start kafka broker
+- run `cargo run` to start the service
 ### Test
-    run `cargo test` to run the tests
+run `cargo test` to run the tests
 
 ### Environnement variables
 This service use the following environnement variables :
 - KAFKA_HOST : kafka broker host
 - PORT : service port 
-- WEBHOOK_URL : webhook url
-Thoses can be set in the .env file
+- WEBHOOK_URL : webhook url  
+Thoses can be set in the .env file for local development and in the docker-compose file for production
 
 # green-got-exercice
 Implémentation d’un service de transformation de données.

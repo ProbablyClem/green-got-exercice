@@ -106,7 +106,7 @@ mod test {
                 Request::builder()
                     .method(Method::POST)
                     .header("content-type", "application/json")
-                    .uri("http://localhost:3000/")
+                    .uri("http://localhost:3000/transaction")
                     .body(Body::from(input.to_string()))
                     .unwrap(),
             )

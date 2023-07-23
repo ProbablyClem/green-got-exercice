@@ -16,3 +16,5 @@ rdkafka = {version = "0.33.2", features = ["cmake-build"]}
 async-trait = "0.1.71"
 hyper = { version = "0.14", features = ["full"] }
 dotenv = "0.15.0"
+utoipa = { version = "3.4.3", features = ["axum_extras"] }
+utoipa-swagger-ui = { version="3.1.4", features = ["axum"] }
