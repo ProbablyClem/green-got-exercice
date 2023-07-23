@@ -7,7 +7,7 @@ Api documentation is available at http://13.37.214.74/swagger-ui/#/
 
 # Run
 start app with `docker-compose up --build`
-this will start the service listening on port 300 and the kafka broker
+this will start the service listening on port 80 and the kafka broker
 
 ## Developpement environnement
 ### Prerequisites
@@ -19,7 +19,8 @@ this will start the service listening on port 300 and the kafka broker
 - run `docker-compose -f docker-compose-kafka.yaml up` to start kafka broker
 - run `cargo run` to start the service
 ### Test
-run `cargo test` to run the tests
+run `cargo test` to run the tests locally  
+run `docker build -f Dockerfile.test .` to run the tests in a docker container (usefull for CI)
 
 ### Environnement variables
 This service use the following environnement variables :
@@ -28,7 +29,10 @@ This service use the following environnement variables :
 - WEBHOOK_URL : webhook url  
 Thoses can be set in the .env file for local development and in the docker-compose file for production
 
-# green-got-exercice
+## Deployment
+A pipeline is configured to deploy the service on AWS EC2 instance on push to main branch
+
+# Consignes
 Implémentation d’un service de transformation de données.
 
 
