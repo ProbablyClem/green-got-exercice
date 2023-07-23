@@ -3,7 +3,7 @@ asynchrounous service that transform data from a kafka topic and send it to a we
 
 ## Documentation
 ### API
-Api documentation is available at http://ec2-13-37-250-1.eu-west-3.compute.amazonaws.com/swagger-ui/#/
+Api documentation is available at http://13.37.214.74/swagger-ui/#/
 
 # Run
 start app with `docker-compose up --build`
