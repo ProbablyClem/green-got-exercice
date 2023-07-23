@@ -1,7 +1,7 @@
 use crate::{models::input_transaction::InputTransaction, Config};
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 
-/// Receive a transaction and add it to the queue
+/// Add a transaction to the queue
 #[utoipa::path(
         post,
         path = "/transaction",
