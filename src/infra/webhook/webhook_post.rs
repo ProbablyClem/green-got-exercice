@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use hyper::{Body, Method, Request};
-use tokio::task::block_in_place;
+
 use tracing::info;
 
 use crate::models::output_transaction::OutputTransaction;

@@ -35,7 +35,7 @@ impl<'a, T : TransactionHandler+ Send + Sync> QueueConsumer<'a, T> for KafkaCons
                         None => (),
                         Some(Ok(s)) => {
                             let input_transaction = input_transaction::InputTransaction::from(s.to_string());
-                            let _ = service.handle(input_transaction);
+                            service.handle(input_transaction).await;
                         }
                         Some(Err(e)) => {
                             warn!("Error while deserializing message payload: {:?}", e);
