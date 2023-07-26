@@ -32,6 +32,7 @@ Thoses can be set in the .env file for local development and in the docker-compo
 ## Deployment
 A pipeline is configured to deploy the service on AWS EC2 instance on push to main branch
 
+[Click here to learn how to replicate the service](node-setup.md)
 # Consignes
 Implémentation d’un service de transformation de données.
 
