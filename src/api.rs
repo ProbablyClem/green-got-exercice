@@ -1,6 +1,9 @@
 use std::net::SocketAddr;
 
+use axum::response::IntoResponse;
+use axum::routing::get;
 use axum::{Router, routing::post};
+use hyper::StatusCode;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -27,7 +30,12 @@ pub async fn start_server(config : Config, addr : SocketAddr) {
     let app : Router<()> = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/transaction", post(receive_transaction))
+        .route("/health", get(health_check))
         .with_state(config.clone());
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+}
+
+async fn health_check() -> impl IntoResponse {
+    StatusCode::OK
 }
